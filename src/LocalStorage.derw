@@ -1,0 +1,27 @@
+import "../derw-packages/derw-lang/stdlib/src/Maybe" exposing (Maybe, Just, Nothing)
+
+exposing (setItem, getItem, removeItem, clear)
+
+setItem: string -> string -> void
+setItem name value =
+    globalThis.localStorage.setItem name value
+
+getItem: string -> Maybe string
+getItem name =
+    let
+        item: any
+        item =
+            globalThis.localStorage.getItem name
+    in
+        if item == null then
+            Nothing
+        else
+            Just { value: item }
+
+removeItem: string -> void
+removeItem name =
+    globalThis.localStorage.removeItem name
+
+clear: any -> void
+clear _x =
+    globalThis.localStorage.clear()
