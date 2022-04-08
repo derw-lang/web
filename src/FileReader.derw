@@ -1,0 +1,7 @@
+import "./FileReader_kernel" as Kernel
+
+exposing (toBase64)
+
+toBase64: any -> (string -> void) -> void
+toBase64 file onFinish =
+    Kernel.toBase64 file onFinish
