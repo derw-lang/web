@@ -1,0 +1,51 @@
+import "./IndexedDB_kernel" as Kernel exposing (Database, Table, Row, Field)
+import "../derw-packages/derw-lang/stdlib/src/Maybe" exposing (Just, Nothing, Maybe)
+
+exposing (Database, Table, Row, Field, open, insert, fetchOne, fetchAll, deleteOne, getField)
+
+open: string -> Table -> (Database -> any) -> void
+open name table onFinish =
+    Kernel.open name table onFinish
+
+insert: Database -> Table -> Row -> (void -> any) -> void
+insert database table row onFinish =
+    Kernel.insert database table row onFinish
+
+fetchOne: Database -> Table -> Field -> (Maybe Row -> any) -> void
+fetchOne database table field onFinish =
+    let
+        onFinishHelper: any -> any
+        onFinishHelper x =
+            if x == null then
+                onFinish Nothing
+            else
+                onFinish (Just { value: x })
+    in
+        Kernel.fetchOne database table field onFinishHelper
+
+fetchAll: Database -> Table -> (List Row -> any) -> void
+fetchAll database table onFinish =
+    Kernel.fetchAll database table onFinish
+
+deleteOne: Database -> Table -> Field -> (void -> any) -> void
+deleteOne database table field onFinish =
+    Kernel.deleteOne database table field onFinish
+
+getFieldHelper: List Field -> Field -> Maybe Field
+getFieldHelper fields field =
+    case fields of
+        [] ->
+            Nothing
+
+        firstField :: rest ->
+            if firstField.name == field.name then
+                Just { value: firstField }
+            else
+                getFieldHelper rest field
+
+        default ->
+            Nothing
+
+getField: Field -> Row -> Maybe Field
+getField field row =
+    getFieldHelper row.fields field
