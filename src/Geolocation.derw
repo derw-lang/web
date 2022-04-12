@@ -1,0 +1,15 @@
+import "./Geolocation_kernel" as Kernel exposing (Position, WatcherId)
+
+exposing (Position, WatcherId, getCurrentPosition, watchPosition, clearWatch)
+
+getCurrentPosition: (Position -> void) -> (void -> void) -> void
+getCurrentPosition onFinish onError =
+    Kernel.getCurrentPosition onFinish onError
+
+watchPosition: (Position -> void) -> (void -> void) -> WatcherId
+watchPosition onFinish onError =
+    Kernel.watchPosition onFinish onError
+
+clearWatch: WatcherId -> void
+clearWatch watcherId =
+    Kernel.clearWatch watcherId
