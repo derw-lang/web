@@ -1,0 +1,21 @@
+exposing (getState, pushState, pushStateWithUrl, replaceState, replaceStateWithUrl)
+
+getState: any -> any
+getState _ =
+    globalThis.history.state
+
+pushState: any -> void
+pushState state =
+    globalThis.history.pushState state ""
+
+pushStateWithUrl: any -> string -> void
+pushStateWithUrl state url =
+    globalThis.history.pushState state "" url
+
+replaceState: any -> void
+replaceState state =
+    globalThis.history.replaceState state ""
+
+replaceStateWithUrl: any -> string -> void
+replaceStateWithUrl state url =
+    globalThis.history.replaceState state "" url
