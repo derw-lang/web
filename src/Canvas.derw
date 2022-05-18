@@ -1,0 +1,30 @@
+import "./Canvas_kernel" as Kernel
+
+exposing (Canvas, RectConfig, Shape, Rect)
+
+exposing (draw)
+
+type alias Canvas = {
+    canvas: any
+}
+
+type alias RectConfig = {
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    color: string
+}
+
+type Shape =
+    Rect { config: RectConfig }
+
+drawRect: Canvas -> RectConfig -> void
+drawRect canvas config =
+    Kernel.drawRect canvas.canvas config
+
+draw: Canvas -> Shape -> void
+draw canvas shape =
+    case shape of
+        Rect { config } ->
+            drawRect canvas config
