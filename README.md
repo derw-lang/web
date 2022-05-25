@@ -114,6 +114,24 @@ update msg model send =
 
 ## History
 
+```elm
+type PageMode = Home | Settings
+
+serializePageMode: PageMode -> string
+serializePageMode pageMode =
+    case PageMode of
+        Home -> "home"
+
+        Settings -> "settings"
+
+pushPageMode: PageMode -> void
+pushPageMode pageMode =
+    serializePageMode pageMode
+        |> History.pushState
+```
+
 ## IndexedDB
+
+
 
 ## LocalStorage
