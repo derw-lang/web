@@ -132,6 +132,151 @@ pushPageMode pageMode =
 
 ## IndexedDB
 
+*experimental*
+
+IndexedDB support works for storing and loading files by their name, as well as deleting them.
+
+```elm
+photoRow: Row
+photoRow =
+    Row { fields: [
+        Field {
+            name: "name",
+            value: ""
+        },
+        Field {
+            name: "binary",
+            value: ""
+        }
+    ] }
+
+photoTable: Table
+photoTable =
+    Table {
+        name: "photos",
+        key: "name",
+        row: photoRow
+    }
+
+photoRowFromPicture: LocationPicture -> Row
+photoRowFromPicture picture =
+    Row { fields: [
+        Field {
+            name: "name",
+            value: picture.name
+        },
+        Field {
+            name: "binary",
+            value: picture.binary
+        }
+    ] }
+
+pictureFromPhotoRow: Row -> Maybe LocationPicture
+pictureFromPhotoRow row =
+    let
+        name: Maybe string
+        name =
+            IndexedDB.getField (Field {
+                name: "name",
+                value: ""
+            }) row
+                |> map (\field -> field.value)
+
+        binary: Maybe string
+        binary =
+            IndexedDB.getField (Field {
+                name: "binary",
+                value: ""
+            }) row
+                |> map (\field -> field.value)
+    in
+        case [
+            name,
+            binary
+        ] of
+            Just { value: name } :: Just { value: binary } :: rest ->
+                Just { value: {
+                    name: name,
+                    binary: binary
+                } }
+
+            default ->
+                Nothing
+
+photoName: string -> Field
+photoName name =
+    Field {
+        name: "name",
+        value: name
+    }
+
+update: Msg -> Model -> (Msg -> void) -> Model
+update msg model send =
+    case msg of
+        LoadDatabase ->
+            let
+                sendDatabase: Database -> void
+                sendDatabase database =
+                    send (DatabaseLoaded { database: database })
+
+                opener: void
+                opener =
+                    IndexedDB.open databaseName photoTable sendDatabase
+            in
+                model
+
+        DatabaseLoaded { database } ->
+            let
+                fetchAll: void
+                fetchAll =
+                    IndexedDB.fetchAll database photoTable (\rows -> send (RowsFetched { rows: rows }))
+            in
+                { ...model, database: Just { value: database } }
+
+        RowsFetched { rows } ->
+            rows
+                |> List.filterMap pictureFromPhotoRow
+                |> (\x ->
+                    {
+                        ...model,
+                        locationPictures: x
+                    }
+                )
+
+        DeleteRow { picture } ->
+            let
+                deleter: void
+                deleter =
+                    case model.database of
+                        Nothing ->
+                            null
+
+                        Just { value } ->
+                            IndexedDB.deleteOne value photoTable (photoName picture.name) (\_ -> send RowDeleted)
+            in
+                model
+
+        RowDeleted ->
+            let
+                reload: void
+                reload =
+                    send FetchAll
+            in
+                model
+
+        FetchAll ->
+            let
+                fetcher: void
+                fetcher =
+                    case model.database of
+                        Nothing ->
+                            null
+
+                        Just { value } ->
+                            IndexedDB.fetchAll value photoTable (\rows -> send (RowsFetched { rows: rows }))
+            in
+                model
+```
 
 
 ## LocalStorage
