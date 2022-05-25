@@ -86,6 +86,32 @@ view model =
 
 ## Geolocation
 
+Geolocation has two main ways of usage: request geolocation on demand, for example after clicking a button or loading a page. Or to continiously watch the geolocation. In Derw both of these uses are achieved via the `send` command.
+
+```elm
+main: RunningProgram Msg Model
+main =
+    { initialModel, view, update, root }
+
+watch: WatcherId
+watch =
+    Geolocation.watchPosition (\pos -> main.send (GotPosition { position: pos })) (\_ -> main.send ErrorLoadingGeoLocation)
+```
+
+
+```elm
+update: Msg -> Model -> (Msg -> void) -> Model
+update msg model send =
+    case msg of
+        GetPositionButtonClicked ->
+            let
+                getPosition: void
+                getPosition =
+                    Geolocation.getCurrentPosition (\pos -> main.send (GotPosition { position: pos })) (\_ -> main.send ErrorLoadingGeoLocation)
+            in
+                model
+```
+
 ## History
 
 ## IndexedDB
