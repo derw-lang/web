@@ -278,5 +278,6 @@ update msg model send =
                 model
 ```
 
-
 ## LocalStorage
+
+See example in offsite-bingo: https://github.com/derw-lang/examples/blob/main/offsite-bingo/src/Main.derw
