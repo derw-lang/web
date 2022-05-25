@@ -43,6 +43,47 @@ view model =
 
 ## FileReader
 
+*Experimental*
+
+Currently the `FileReader` API only supports converting files passed from events into base64, for example images.
+
+`base64` takes the file object and a callback for when the base64 encoding is done.
+
+```elm
+type Msg = UploadPicture { file: File } | InsertPicture { binary: string }
+
+uploadPicture: Event -> Msg
+uploadPicture event =
+    UploadPicture {
+        file: event.target.files[0]
+    }
+
+update: Msg -> Model -> (Msg -> void) -> Model
+update msg model send =
+    case msg of
+        UploadPicture { file } ->
+            let
+                base64: void
+                base64 =
+                    FileReader.toBase64 file (\encoded -> send (InsertPicture { binary: encoded } ) )
+            in
+                model
+
+        InsertPicture { binary } ->
+            { ...model, picture: binary }
+
+view: Model -> HtmlNode Msg
+view model =
+    div [ on "change" uploadPicture ] [ attribute "id" "file-take" ] [
+        Html.label [ ] [ attribute "for" "take-a-picture" ] [ text "Take a picture: " ],
+        Html.input [ ] [
+            attribute "id" "take-a-picture",
+            attribute "type" "file",
+            attribute "capture" "file"
+        ]
+    ]
+```
+
 ## Geolocation
 
 ## History
